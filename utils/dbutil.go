@@ -1,7 +1,5 @@
 package utils
 
-import "sync"
-
 /*
 数据库工具
 
@@ -14,18 +12,19 @@ import "sync"
 将姓名与分数写入Redis缓存
 
 还实现了一个通用的MySQL表查询方法：根据任意表名和查询条件map进行查询，并将结果送入指定的指针地址中，从而具有较高的复用价值
- */
+*/
 import (
 	"fmt"
 	/*MySQL*/
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
-	"github.com/garyburd/redigo/redis"
 	"errors"
 	"sync"
+
+	"github.com/garyburd/redigo/redis"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 )
 
-var(
+var (
 	//数据库读写锁
 	dbMutext sync.RWMutex
 )
@@ -36,7 +35,7 @@ tableName	要查询的表名
 argsMap		查询条件集合
 dest		查询结果存储地址
 */
-func QueryFromMysql(tableName string,argsMap map[string]interface{},dest interface{}) (err error) {
+func QueryFromMysql(tableName string, argsMap map[string]interface{}, dest interface{}) (err error) {
 	fmt.Println("QueryScoreFromMysql...")
 
 	//写入期间不能进行数据库读访问
@@ -47,12 +46,12 @@ func QueryFromMysql(tableName string,argsMap map[string]interface{},dest interfa
 
 	selection := ""
 	values := make([]interface{}, 0)
-	for col,value := range argsMap{
-		selection += (" and "+col+"=?")
+	for col, value := range argsMap {
+		selection += (" and " + col + "=?")
 		values = append(values, value)
 	}
 	selection = selection[4:]
-	sql := "select * from "+tableName+" where "+selection;
+	sql := "select * from " + tableName + " where " + selection
 
 	err = db.Select(dest, sql, values...)
 	if err != nil {

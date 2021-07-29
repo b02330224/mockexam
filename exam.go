@@ -1,15 +1,16 @@
 package main
 
 import (
-	"time"
 	"fmt"
 	"mockexam/utils"
+	"time"
 )
+
 /*
 这里封装了巡考、考试、查成绩逻辑
- */
+*/
 
-var(
+var (
 	chNames = make(chan string, 100)
 	examers = make([]string, 0)
 
@@ -68,13 +69,13 @@ func QueryScore(name string) {
 	if err != nil {
 		fmt.Println(err)
 		//score, _ = utils.QueryScoreFromMysql(name)
-
 		scores := make([]utils.ExamScore, 0)
 		argsMap := make(map[string]interface{})
 		argsMap["name"] = name
 		//argsMap["score"] = 50
 		err = utils.QueryFromMysql("score", argsMap, &scores)
-		utils.HandlerError(err,`utils.QueryFromMysql("score", argsMap, &scores)`)
+
+		utils.HandlerError(err, `utils.QueryFromMysql("score", argsMap, &scores)`)
 		fmt.Println("Mysql成绩：", name, ":", scores[0].Score)
 
 		/*将数据写入Redis*/
